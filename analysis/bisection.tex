@@ -1,25 +1,84 @@
 \documentclass[12pt]{article}
 \usepackage{amsmath}
+\usepackage{listings}
+\usepackage{mathtools}
 
 \title{Analysis of the Bisection Method}
 \author{Bernardo Brust}
+
+\newtheorem{theorem}{Theorem}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-  Analysing an implementation of the Bisection Method for finding roots of functions using GNU Octave~\cite{octave}.
+  Analysing an implementation of the Bisection Method for finding roots of functions using GNU Octave~\cite{octave} in an informal manner, based on the information provided by the book ``Numerical Analysis''.~\cite{book}.
 \end{abstract}
 
-\section{Introduction to the method}\label{sec:intro}
+\section{Theoretical Development}\label{sec:intro}
 
-We use the book~\cite{book} as reference for this.
+The Bisection Method is a simple root finding method that always converges under its input restrictions.
 
-Some cool math symbols:
+First we need the intermediate value theorem.
 
-\begin{equation}
-f(x) = \int \dot{g}(x)\,dx = g(x) + C
+\begin{theorem}
+  Intermediate Value Theorem: let $f(x)$ be continuous on the interval $[a, b]$ and $k$ be a number such that \(f(a) < k < f(b)\), then there is a value $c$ that satisfies \(f(c) = k\).
+\end{theorem}
+
+This is useful because of the following consequence: if we let $k = 0$ and $f(a)f(b) < 0$ (this implies that the signal of the function changes), then the Intermediate Value Theorem ensures that there exists (at least one) a $c$ such that \(f(c) = 0\). The Bisection Method uses this to find the value of $c$ given the interval $[a, b]$.
+
+\section{The Algorithm}\label{sec:algorithm}
+
+The algorithm can informally be described as follows:
+\begin{enumerate}\label{alg:bisection}
+        \item Check that the interval $[a, b]$ satisfies the condition $f(a)f(b) < 0$.
+        \item Calculate the midpoint of the interval.
+        \item If either we found a root at the midpoint or the interval is smaller than a given $\epsilon$ we can return the middle point.
+        \item Otherwise, we check if we should reduce, a.k.a replace the edge with the midpoint, the left part (in the case of $f(a)f(p) < 0$) or the right part ($f(a)f(p) > 0$).
+\end{enumerate}
+
+Notice that the algorithm closelly resembles the idea of Binary Searching from Computer Science, so the analysis will carry on a similar manner.
+
+\section{Analysis of the Algorithm}\label{sec:analysis}
+
+We can define a simple iteration rule: we have a search space $s = b - a$, after every step it reduces to $s/2$. Because we are halving every step, the number of iterations is proportional to the logarithm in base $2$ (binary logarithm as some call it) of the input, hence, in Computer Science terminology one could say: $\text{Bisection}(n) \in O(\lg(n))$. More mathematically, we can derive the following formula for the number of steps required to converge:
+\begin{equation}\label{eq:upper-bound-bisection-v1}
+  \frac{|b - a|}{2^n} < \epsilon
 \end{equation}
+
+Or written in terms of the binary logarithm with $n$ isolated:
+\begin{equation}\label{eq:upper-bound-bisection-v2}
+  n = \ceil*{\log_2\left(\frac{b - a}{\epsilon}\right)}
+\end{equation}
+
+Notice that~\eqref{eq:upper-bound-bisection-v2} provides an upper bound, not the exact amount of iterations required, so we may get better results than the formula might indicate.
+
+\section{Implementation}\label{sec:implementation}
+
+For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. The source code can be found in the GitHub repository ``NumericalMethods''~\cite{repo}, along with the sources of the analysis papers and other methods.
+
+The implementation is almost a $1 : 1$ translation of the algorithm described earlier, the only change we make is that instead of validating that the interval satisfies $f(a)f(b) < 0$, we check if the signs are the signs are different to avoid a multiplication.
+
+\section{Results}\label{sec:results}
+
+The final executable can recieve a function, an interval and an $\epsilon$ to return the found root, along with the number of iterations taken and the expected error:
+\begin{lstlisting}[caption={Sample execution of the program},label={lst:sample-run}]
+> Enter f(x): x^2 - cos(x)
+> Enter the interval [a, b]: [-0.2, pi / 2]
+> Enter the tolerance/epsilon: 1e-12
+
+Root found: 0.82413231
+Iterations: 41
+Estimated error: 8.05e-13
+\end{lstlisting}
+
+In the case above, if we tried our formula for the number of steps, we would have gotten $x > 40.6875$ which would point to a minimum of $41$ iterations, exactly what we got. However, we got an estimated error to $13$ decimal places, which is better than the $12$ we asked for.
+
+\section{Conclusion and Discussion}\label{sec:conlusion}
+
+In conclusion, the Bisection Method is a simple, stable and reliable algorithm to find solutions to equations in the form $f(x) = 0$, however, it is slow compared to other methods like Newton-Raphson, or even derivative-free ones such as the Secant Method. So it serves more as a theorical basis to other methods rather than an actually useful one.
 
 \bibliographystyle{ieeetr}
 \bibliography{bibliography}

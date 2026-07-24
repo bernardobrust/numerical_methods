@@ -1,7 +1,7 @@
 # NumericalMethods
 Effective implementations of standard numerical methods using GNU Octave.
 
-> This repo was built by me for the Numerical Calculus class on UERJ-IPRJ
+This repo was built by me for the Numerical Calculus class on UERJ-IPRJ. Note that the papers have a more informal tone. If you'd like a more formal presentation of the topic check out the reference book.
 
 **Reference book: Numerical Analysis, by Burden and Faires**
 
