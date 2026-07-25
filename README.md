@@ -21,3 +21,4 @@ octave $CATEGORY/$METHOD # e.g root_finding/bisection.m
 ## Method Listing:
 ### Root finding:
 - [Bisection](methods/root_finding/bisection.m): Basically binary search for finding zeros of functions, it's slow, but it's reliable.
+- [Newton-Raphson](methods/root_finding/newton_raphson.m): A **blazingly fast** method that uses interesting propreties of derivatives and Taylor Series to accelerate convergence, doesen't always work tho.
