@@ -1,0 +1,170 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+\title{Analysis of the Newton-Raphson Method}
+\author{Bernardo Brust}
+
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  Analysing an implementation of the Newton-Raphson Method for finding roots of functions using GNU Octave~\cite{octave} in an informal manner, based on the information provided by the book ``Numerical Analysis''.~\cite{book}.
+\end{abstract}
+
+\section{Theoretical Development}\label{sec:intro}
+
+The Newton-Raphson Method is a fast root finding thecnique that may diverge, but it's speed is usually worth it. It's often the best choise for solving equations in the form $f(x) = 0$ when $f$ is differentiable.
+
+First we consider the Taylor Polynomial of $f$ around some point $p_0$, our guess of where the root is, for a point $f(p) = 0$, our destination root:
+\begin{gather*}
+    f(p) = f(p_0) + (p - p_0)f'(p_0) + \frac{{(p - p_0)}^2}{2}f''(\xi(p)) \\
+    0 = f(p_0) + (p - p_0)f'(p_0) + \frac{{(p - p_0)}^2}{2}f''(\xi(p))
+\end{gather*}
+
+The idea for the method comes from the inspiered assumption that $|p - p0|$ is ``small'', a.k.a the initial guess is suficiently close to the root,  and therefore ${(p - p_0)}^2$ is even smaller, so we can drop the quadratic term and aproximate $p$:
+\[
+  0 \approx f(p_0) + (p - p_0)f'(p_0)
+\]
+\begin{equation}\label{eq:newton_raphson_equation}
+  p \approx p_0 - \frac{f(p_0)}{f'(p_0)}
+\end{equation}
+
+The above equation~\eqref{eq:newton_raphson_equation} is the key idea behind Newton's method, as we can propose an intial guess $p0$ of where the root is, use it to calculate a $p_1$ (which is represented as $p$ in the equation), then use that $p_1$ as a guess for $p_2$ and so on until $|p_n - p_{n-1}| < \epsilon$. Note however that the iteration formula contains a division by the derivative, so if that's ever $0$ (or close to it) the method diverges. We'll explore divergence scenarios more in the analysis (Section~\ref{sec:analysis}).
+
+\section{The Algorithm}\label{sec:algorithm}
+
+The algorithm can informally be described as follows:
+\begin{enumerate}\label{alg:newton_alg}
+        \item Calculte $f(p_0)$ and $f'(p_0)$.
+        \item Check that the derivative isn't very close to $0$, otherwise stop as possible divergence.
+        \item Calculate the new guess for the root using the formula~\eqref{eq:newton_raphson_equation}.
+        \item If the new root guess is good enough ($|p_n - p_{n - 1}| < \epsilon$ in this case, there are other ways to check this), return it, otherwise update $p_0$ and repeat.
+\end{enumerate}
+
+This algorithm is stright forward, but there is an interesting step in it: calculating $f'(p_0)$. Even tho first yers students of any exact sciences degree can calculate a derivative analytically, that's much harder for computers, so we are left with 3 options:
+\begin{enumerate}
+        \item Take a numerical derivative. That's not ideal, as that would introduce more error in the final root calculation via truncation and rounding errors.
+  \item Ask for the function $f'$ alongside $f$. That works, but we need to trust that the user took the derivative correctly. Moreover, it's exceted that the program would do all the work.
+        \item Take a symbolic derivative. We could code that ourselves, yes, or use a pre-made and reliable package. The first one is a lot of programming work for a mathematically inclined study, so we'll go with the latter, even if that introduces more dependedncies into the final code.
+\end{enumerate}
+
+More details about this in the implementation (Section~\ref{sec:implementation}).
+
+\section{Analysis of the Algorithm}\label{sec:analysis}
+
+We'll divide our analysis into 2 parts: convergence speed and divergence scenarios.
+
+\subsection{Convergence Speed Analysis}
+
+In this subsection we assume that the method will actually converge for the given $f$ and $p_0$.
+
+Newton's Method converges quadratically, that is, the the number of cerrect digits roughly doubles with every iteration. One can prove this by showing that if we define
+\[
+  e_n = p_n - p
+\]
+Where $e_n$ is the error in the iteration $n$ and $p$ is the root, then:
+\[
+  e_{n + 1} \approx Ce^2_n
+\]
+For some constant $C$. We won't prove that as that's a long and thecnical proof.
+
+We will however, look at how much better quadratic convergence is compared to linear converge (from the bisection method):
+
+In the Bisection Method the error is approximately halved,
+\[
+e_{n+1} \approx \frac{1}{2}e_n.
+\]
+Thus, if the current error is $10^{-1}$, the sequence of errors is approximately
+\[
+10^{-1},\; 5\times10^{-2},\; 2.5\times10^{-2},\; 1.25\times10^{-2},\; \ldots
+\]
+In contrast, Newton's method converges quadratically,
+\[
+e_{n+1} \approx Ce_n^2,
+\]
+Ignoring the constant $C$ to illustrate the asymptotic behavior, if the initial error is $10^{-1}$, then
+\[
+10^{-1},\; 10^{-2},\;10^{-4},\; 10^{-8},\;10^{-16},\; 10^{-32},\; \ldots
+\]
+Hence, while bisection gains roughly one binary digit (or about $0.3$ decimal digits) of accuracy per iteration, Newton's method approximately doubles the number of correct digits at each iteration once it enters the quadratic convergence regime.
+
+\subsection{Divergence Scenarios}
+
+Now we consider the bad part of this method: it doesen't always work. Here follow some examples.
+
+Consider the simple function: $f(x) = x^2 - 1$. The roots are obvious, but if we use $p_0 = 0$ the method will fail, as the calculation in step 3 of the algorithm will be
+\[
+  p_1 = 0 - \frac{{0^2 - 1}}{2(0)} = \frac{-1}{0}
+\]
+which is obviously undefined.
+
+Now consider the function $f(x) = x^3 - x$, which has clear roots at $-1, 0, 1$. The method isn't concerned with what root you want, it just follows the geometry of the function, so what root is returned for $0.5$? It may be counter-intuitive, but it will return $-1$. If the roots were unknown one could completly miss the fact that the roots $-1$ and $0$ exist.
+
+Lastly, consider $f(x) = x^3 - 2x + 2$ with the intitial guess $p_0 = 0$. The iterations will be as follows:
+\[
+  1,\; 0,\; 1,\; 0,\; \ldots
+\]
+resulting in either an infinite loop or the method exceeding a given maximum number of iterations.
+
+So from this subsection we leave a remark:
+\begin{remark}
+Newton's Method: Initial Guess.
+The convergence of Newton's method is generally local rather than global. If the initial guess is too far from the desired root, at a minima/maxima or at an unfortunate point, the method may converge to a different root, oscillate, or fail to converge altogether.
+\end{remark}
+
+\section{Implementation}\label{sec:implementation}
+
+For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. The source code can be found in the GitHub repository ``NumericalMethods''~\cite{repo}, along with the sources of the analysis papers and other methods.
+
+The implementation follows the algorithm described in Section~\ref{sec:algorithm}. In reguards to the discussion on taking the derivative of $f$, I opted to let the user choose to insert the derivative (we trust the user in this case, typically considered a bad move by computer scientists), or let octave do it, in which case we rely on the ``Symbolic''~\cite{octave_symbolic} package. The numerical dedrivative is avoided, as it's another method itself and worthy of it's own paper, but with the method already implemented it's integration into the implementation would be trivial.
+
+\section{Results}\label{sec:results}
+
+The final executable recieves a function, may recieve the derivative, an initial guess and an $\epsilon$ to return the found root, along with the number of iterations taken. The listing below shows a sample execution.
+\begin{lstlisting}[caption={Sample execution of the program},label={lst:sample-run}]
+> Enter f(x): x^2 - cos(x)
+> How would you like automatic derivation? (yes or no) yes
+Symbolic pkg v3.2.2: Python communication link active, SymPy v1.14.0.
+> Enter the initial guess: pi / 2
+> Enter the tolerance/epsilon: 1e-12
+
+Root found: 0.82413231
+Iterations: 6
+\end{lstlisting}
+Note that the symbolic package is only loaded if the user chooses automatic derivation, this keeps the dependency optional.
+
+Now compare this result with the one presented on the paper about the Bisection Method: we took $35$ less iterations using the Newton-Raphson Method, this shows the power of quadratic convergence.
+
+For one more demonstration, consider the oscillating example from Section~\ref{sec:analysis}:
+\begin{lstlisting}[caption={Diverging example},label={lst:divergence-run}]
+> Enter f(x): x^3 - 2*x + 2
+> How would you like automatic derivation? (yes or no) no
+> Enter f'(x): 3*x^2 - 2
+> Enter the initial guess: 0
+> Enter the tolerance/epsilon: 1e-3
+warning: Reached maximum iterations without converging.
+warning: called from
+    newton_raphson at line 24 column 3
+    methods/root_finding/newton_raphson.m at line 47 column 2
+
+Root found: 0.00000000
+Iterations: 128
+\end{lstlisting}
+In this example we see that the algorithm has an iteration limit of $128$ and warns the user upon diverging. This wouldn't have happened if we used a Bisection, which correcly converges to $-1.76855469$ in $12$ iterations given the interval $[-2, 2]$.
+
+\section{Conclusion and Discussion}\label{sec:conlusion}
+
+In conclusion, Newton's Method is a method that converges incredibly fast at the cost of not being totaly reliable. It presents some facinating theory on with Taylor Series and convergence. Even in it's downsides it some interesting propreties such as oscilation. I really like the idea of a ``Non-Calculatable Oscilatory Newtonian Function'', it may become an actual thing some day.
+
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
+
+\end{document}
