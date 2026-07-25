@@ -37,19 +37,19 @@ The idea for the method comes from the inspiered assumption that $|p - p0|$ is `
   p \approx p_0 - \frac{f(p_0)}{f'(p_0)}
 \end{equation}
 
-The above equation~\eqref{eq:newton_raphson_equation} is the key idea behind Newton's method, as we can propose an intial guess $p0$ of where the root is, use it to calculate a $p_1$ (which is represented as $p$ in the equation), then use that $p_1$ as a guess for $p_2$ and so on until $|p_n - p_{n-1}| < \epsilon$. Note however that the iteration formula contains a division by the derivative, so if that's ever $0$ (or close to it) the method diverges. We'll explore divergence scenarios more in the analysis (Section~\ref{sec:analysis}).
+The above equation~\eqref{eq:newton_raphson_equation} is the key idea behind Newton's method, as we can propose an intial guess $p0$ of where the root is, use it to calculate a $p_1$ (which is $p$ in the equation), then use that $p_1$ as a guess for $p_2$ and so on until $|p_n - p_{n-1}| < \epsilon$. Note however that the iteration formula contains a division by the derivative, so if that's ever $0$ (or close to it) the method diverges. We'll explore divergence scenarios more in the analysis (Section~\ref{sec:analysis}).
 
 \section{The Algorithm}\label{sec:algorithm}
 
-The algorithm can informally be described as follows:
+The algorithm is informally described as follows:
 \begin{enumerate}\label{alg:newton_alg}
         \item Calculte $f(p_0)$ and $f'(p_0)$.
-        \item Check that the derivative isn't very close to $0$, otherwise stop as possible divergence.
+        \item Check that the derivative isn't too close to $0$, otherwise stop as possible divergence.
         \item Calculate the new guess for the root using the formula~\eqref{eq:newton_raphson_equation}.
         \item If the new root guess is good enough ($|p_n - p_{n - 1}| < \epsilon$ in this case, there are other ways to check this), return it, otherwise update $p_0$ and repeat.
 \end{enumerate}
 
-This algorithm is stright forward, but there is an interesting step in it: calculating $f'(p_0)$. Even tho first yers students of any exact sciences degree can calculate a derivative analytically, that's much harder for computers, so we are left with 3 options:
+This algorithm is stright forward, but there is an interesting step in it: calculating $f'(p_0)$. Even tho first yers students of any exact sciences degree can calculate a derivative analytically, that's much harder for computers, so we're left with 3 options:
 \begin{enumerate}
         \item Take a numerical derivative. That's not ideal, as that would introduce more error in the final root calculation via truncation and rounding errors.
   \item Ask for the function $f'$ alongside $f$. That works, but we need to trust that the user took the derivative correctly. Moreover, it's exceted that the program would do all the work.
@@ -66,7 +66,7 @@ We'll divide our analysis into 2 parts: convergence speed and divergence scenari
 
 In this subsection we assume that the method will actually converge for the given $f$ and $p_0$.
 
-Newton's Method converges quadratically, that is, the the number of cerrect digits roughly doubles with every iteration. One can prove this by showing that if we define
+Newton's Method converges quadratically, that is, the number of cerrect digits roughly doubles with every iteration. One can prove this by showing that if we define
 \[
   e_n = p_n - p
 \]
@@ -76,7 +76,7 @@ Where $e_n$ is the error in the iteration $n$ and $p$ is the root, then:
 \]
 For some constant $C$. We won't prove that as that's a long and thecnical proof.
 
-We will however, look at how much better quadratic convergence is compared to linear converge (from the bisection method):
+We will however, look at how much better quadratic convergence than linear converge (from the bisection method):
 
 In the Bisection Method the error is approximately halved,
 \[
@@ -106,7 +106,7 @@ Consider the simple function: $f(x) = x^2 - 1$. The roots are obvious, but if we
 \]
 which is obviously undefined.
 
-Now consider the function $f(x) = x^3 - x$, which has clear roots at $-1, 0, 1$. The method isn't concerned with what root you want, it just follows the geometry of the function, so what root is returned for $0.5$? It may be counter-intuitive, but it will return $-1$. If the roots were unknown one could completly miss the fact that the roots $-1$ and $0$ exist.
+Now consider the function $f(x) = x^3 - x$, which has clear roots at $-1, 0, 1$. The method isn't concerned with what root you want, it just follows the geometry of the function, so what is the root returned for $p_0 = 0.5$? It may be counter-intuitive, but it will return $-1$. If the roots were unknown one could completly miss the fact that the roots $-1$ and $0$ exist.
 
 Lastly, consider $f(x) = x^3 - 2x + 2$ with the intitial guess $p_0 = 0$. The iterations will be as follows:
 \[
@@ -124,7 +124,7 @@ The convergence of Newton's method is generally local rather than global. If the
 
 For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. The source code can be found in the GitHub repository ``NumericalMethods''~\cite{repo}, along with the sources of the analysis papers and other methods.
 
-The implementation follows the algorithm described in Section~\ref{sec:algorithm}. In reguards to the discussion on taking the derivative of $f$, I opted to let the user choose to insert the derivative (we trust the user in this case, typically considered a bad move by computer scientists), or let octave do it, in which case we rely on the ``Symbolic''~\cite{octave_symbolic} package. The numerical dedrivative is avoided, as it's another method itself and worthy of it's own paper, but with the method already implemented it's integration into the implementation would be trivial.
+The implementation follows the algorithm described in Section~\ref{sec:algorithm}. In reguards to the discussion on taking the derivative of $f$, I opted to let the user choose to insert the derivative (we trust the user in this case, typically considered a bad move by computer scientists), or let octave do it, in which case we rely on the ``Symbolic''~\cite{octave_symbolic} package. I decided to not implement the numerical derivative, as it's another method itself and worthy of it's own paper, but with the method already implemented it's integration into the implementation would be trivial.
 
 \section{Results}\label{sec:results}
 

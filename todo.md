@@ -15,4 +15,4 @@
 - [ ] Müller's method, analysis
 
 ### Extra
-- [ ] Grammar check Newton's analysis
+- [x] Grammar check Newton's analysis
