@@ -1,0 +1,57 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+\title{Analysis of the Newton-Raphson Method}
+\author{Bernardo Brust}
+
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  A brief explanation of what numerical methods are and their uses/aplications.
+\end{abstract}
+
+\section{What and Why are Numerical Methods?}\label{sec:intro}
+
+Numerical Methods arise from the fact that mathematics isn't always perfect, in the sense that not every problem has an exact solution. Equations may not have an exact representation of their solutions, integrals may not have closed form solution, etc.
+
+To make things clearer, consider the equation $f(x) = x^2 - \cos(x)$ and we need to find it's roots. This is a problem does not have, what we call in math lingo as an \emph{analytical solution}. The root isn't $\sqrt{5} - \sqrt{3}$ or $\pi/e$ or some other stunning relation between loved constants, it's aproximetly $0.824132312301814$. But how does one find such approximation?
+
+One obvious but extremly inefective way to guess and check: plug in some value for $x$, evalueate, and see how close to $0$ it was. This can \emph{acually} take forever, as the real number line is an infinite search space. So we need a better method.
+
+In the following papers I'll describe (based on the reference book~\cite{book}) and implement (using GNU Octave~\cite{octave}) some important numerical methods for different situations, such as the one described above (for a simple aswer to the problem check ``Bisection'', for a faster but more complex one check ``Newton-Raphson'').
+
+One last question the reader might be asking is ``How often do these sorts of problems appear in the real world''? And for an aswer I'd recomend asking your local Engineering student.
+
+\subsection{On Numerical Analysis}\label{sec:further-explanation}
+
+Some may argue that there's a difference between ``Numerical Methods'' and ``Numerical Analysis'' based on rigor, similar to ``Calculus'' and ``Analysis''. In the case of Calculus I can agree, as one focuses on solving integrals and derivatives and the other on writing proofs and asking more abstract questions. Numerical does not have such difference. In the modern day, the purpuse of these thecniques it to run on a computer as doing such methods by hand is as time consuming as it gets, and requires a calculator anyway (try doing 5 iterations of newton's method by hand).
+
+So the entire focus shifts from doing calculations to proving and improving methods, which requires thecniques from Analysis and Linear Algebra.
+
+\section{Structure}\label{sec:intro}
+
+The point of this repository (it's papers and code) it to supplement the reference book~\cite{book}, be it by simplifying some complex parts, giving more examples and offering implementations in another language (the online code for the methods in the book is not implemented in GNU Octave). This is by no means a replacement for the book.
+
+The structure of the papers is as follows:
+\begin{enumerate}
+  \item Theoretical Development. A short and fast explanation of what math we build upon to extract the algorithm.
+  \item The Algorithm. An informal and simple explanation of what the implementation   will look like.
+  \item Analysis of the Algorithm. We consider the convergence speed and reliability of the algorithm to get a feel for it's upsides and downsides.
+  \item Implementation. Some implementation detais that arise when moving from theory to practice.
+  \item Results. What the actual code turned out, the practical part of the whole process of analysing and implementing a method.
+  \item Conclusion and Discussion. Some final notes about the method.
+\end{enumerate}
+
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
+
+\end{document}

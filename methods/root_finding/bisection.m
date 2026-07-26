@@ -44,6 +44,9 @@ interval = input("Enter the interval [a, b]: ");
 eps = input("Enter the tolerance/epsilon: ");
 [root, iterations, final_err] = bisection(f, interval(1), interval(2), eps);
 
-printf("Root found: %.8f\n", root);
+format long
+disp("Root found:") , disp(root);
 printf("Iterations: %d\n", iterations);
-printf("Estimated error: %.2e\n", final_err);
+
+format long e
+disp("Estimated error:"), disp(final_err);

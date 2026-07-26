@@ -2,12 +2,12 @@
 # Compiling Analysis Papers
 #
 
-PAPER ?= paper
+PAPER ?=
 
 all: $(PAPER).pdf
 
 $(PAPER).pdf: $(PAPER).tex bibliography.bib
-	pdflatex $(PAPER).tex
+	pdflatex $(PAPER).tex 
 	bibtex $(PAPER)
 	pdflatex $(PAPER).tex
 	pdflatex $(PAPER).tex

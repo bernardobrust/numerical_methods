@@ -31,7 +31,7 @@ This is useful because of the following consequence: if we let $k = 0$ and $f(a)
 
 \section{The Algorithm}\label{sec:algorithm}
 
-The algorithm can informally be described as follows:
+The algorithm is informally described as follows:
 \begin{enumerate}\label{alg:bisection}
         \item Check that the interval $[a, b]$ satisfies the condition $f(a)f(b) < 0$.
         \item Calculate the midpoint of the interval.
@@ -57,7 +57,7 @@ Notice that~\eqref{eq:upper-bound-bisection-v2} provides an upper bound, not the
 
 \section{Implementation}\label{sec:implementation}
 
-For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. The source code can be found in the GitHub repository ``NumericalMethods''~\cite{repo}, along with the sources of the analysis papers and other methods.
+For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. One can find the source code in the GitHub repository ``NumericalMethods''~\cite{repo}, along with the sources of the analysis papers and other methods.
 
 The implementation is almost a $1 : 1$ translation of the algorithm described earlier, the only change we make is that instead of validating that the interval satisfies $f(a)f(b) < 0$, we check if the signs are the signs are different to avoid a multiplication.
 
@@ -69,9 +69,11 @@ The final executable can recieve a function, an interval and an $\epsilon$ to re
 > Enter the interval [a, b]: [-0.2, pi / 2]
 > Enter the tolerance/epsilon: 1e-12
 
-Root found: 0.82413231
+Root found:
+0.824132312301814
 Iterations: 41
-Estimated error: 8.05e-13
+Estimated error:
+8.052447597606260e-13
 \end{lstlisting}
 
 In the case above, if we tried our formula for the number of steps, we would have gotten $x > 40.6875$ which would point to a minimum of $41$ iterations, exactly what we got. However, we got an estimated error to $13$ decimal places, which is better than the $12$ we asked for.

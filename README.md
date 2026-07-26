@@ -1,7 +1,7 @@
 # NumericalMethods
 Effective implementations of standard numerical methods using GNU Octave.
 
-This repo was built by me for the Numerical Calculus class on UERJ-IPRJ. Note that the papers have a more informal tone. If you'd like a more formal presentation of the topic check out the reference book.
+I'm building this repo for the Numerical Calculus class on UERJ-IPRJ. Note that the papers have a more informal tone. If you'd like a more formal presentation of the topic check out the reference book.
 
 **Reference book: Numerical Analysis, by Burden and Faires**
 
@@ -18,7 +18,11 @@ The code for the implementations is avaliable under [methods/](methods/), you ca
 octave $CATEGORY/$METHOD # e.g root_finding/bisection.m
 ```
 
+In case you wonder why all the papers are in one directory while the implementations are split into category, I suggest you first question why do you need to run `pdflatex` 3 times to build the file.
+
 ## Method Listing:
+An introduction to Numerical Methods is avaliable at `analysis/introduction`.
+
 ### Root finding:
 Methods for solving equations in the form $f(x) = x$.
 

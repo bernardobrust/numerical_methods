@@ -46,5 +46,6 @@ initial_guess = input("Enter the initial guess: ");
 eps = input("Enter the tolerance/epsilon: ");
 [root, iterations] = newton_raphson(f, f_prime, initial_guess, eps);
 
-printf("Root found: %.8f\n", root);
+format long
+disp("Root found:"), disp(root);
 printf("Iterations: %d\n", iterations);

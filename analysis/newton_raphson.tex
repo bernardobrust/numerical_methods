@@ -136,7 +136,8 @@ Symbolic pkg v3.2.2: Python communication link active, SymPy v1.14.0.
 > Enter the initial guess: pi / 2
 > Enter the tolerance/epsilon: 1e-12
 
-Root found: 0.82413231
+Root found:
+0.824132312302522
 Iterations: 6
 \end{lstlisting}
 Note that the symbolic package is only loaded if the user chooses automatic derivation, this keeps the dependency optional.
@@ -155,7 +156,8 @@ warning: called from
     newton_raphson at line 24 column 3
     methods/root_finding/newton_raphson.m at line 47 column 2
 
-Root found: 0.00000000
+Root found:
+0
 Iterations: 128
 \end{lstlisting}
 In this example we see that the algorithm has an iteration limit of $128$ and warns the user upon diverging. This wouldn't have happened if we used a Bisection, which correcly converges to $-1.76855469$ in $12$ iterations given the interval $[-2, 2]$.
