@@ -5,7 +5,7 @@ function [root, iter, err] = bisection(f, a, b, tol = 1e-6, max_iter = 128)
   fa = f(a);
   fb = f(b);
 
-  % The theorem states that fa * fb < 0 for a root to exist, this is ineficient.
+  % The theorem states that fa * fb < 0 for a root to exist, this is inefficient.
   % We can instead use sign(fa) == sign(fb), which avoids a multiplication
   if sign(fa) == sign(fb)
     error("bisection:invalidInterval", ...

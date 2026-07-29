@@ -5,6 +5,7 @@
 - [ ] Steffensen's method
 - [ ] Honer's method
 - [ ] Müller's method
+- [ ] Taylor Series Approximation
 
 ### Docs + papers
 - [ ] Intro 2 Numerical Methods
@@ -13,6 +14,4 @@
 - [ ] Steffensen's method, analysis
 - [ ] Honer's method, analysis
 - [ ] Müller's method, analysis
-
-### Extra
-- [x] Grammar check Newton's analysis
+- [ ] Taylor Series Approximation, analysis

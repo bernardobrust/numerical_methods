@@ -1,12 +1,15 @@
 \documentclass[12pt]{article}
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{listings}
 \usepackage{mathtools}
 
 \title{Analysis of the Bisection Method}
 \author{Bernardo Brust}
 
-\newtheorem{theorem}{Theorem}
+\theoremstyle{plain}
+\newtheorem*{theorem*}{Theorem}
+
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
@@ -14,20 +17,20 @@
 \maketitle
 
 \begin{abstract}
-  Analysing an implementation of the Bisection Method for finding roots of functions using GNU Octave~\cite{octave} in an informal manner, based on the information provided by the book ``Numerical Analysis''.~\cite{book}.
+  Analyzing an implementation of the Bisection Method for finding roots of functions using GNU Octave~\cite{octave} in an informal manner, based on the information provided by the book ``Numerical Analysis''.~\cite{book}.
 \end{abstract}
 
-\section{Theoretical Development}\label{sec:intro}
+\section{Theoretical Development}\label{sec:theory}
 
-The Bisection Method is a simple root finding thecnique that always converges under its input restrictions.
+The Bisection Method is a simple root finding technique that always converges under its input restrictions.
 
-First we need the intermediate value theorem.
+The Bisection Method relies on the Intermediate Value Theorem.
 
-\begin{theorem}
-  Intermediate Value Theorem: let $f(x)$ be continuous on the interval $[a, b]$ and $k$ be a number such that \(f(a) < k < f(b)\), then there is a value $c$ that satisfies \(f(c) = k\).
-\end{theorem}
+\begin{theorem*}
+  Intermediate Value Theorem: let $f(x)$ be continuous on the interval $[a, b]$ and $k$ be a number such that $f(a) < k < f(b)$, then there is a value $c$ that satisfies $f(c) = k$.
+\end{theorem*}
 
-This is useful because of the following consequence: if we let $k = 0$ and $f(a)f(b) < 0$ (this implies that the signal of the function changes), then the Intermediate Value Theorem ensures that there exists (at least one) a $c$ such that \(f(c) = 0\). The Bisection Method uses this to find the value of $c$ given the interval $[a, b]$.
+This is useful because of the following consequence: if we let $k = 0$ and $f(a)f(b) < 0$ (this implies that the signal of the function changes), then the Intermediate Value Theorem ensures that there exists (at least one) a $c$ such that $f(c) = 0$. The Bisection Method uses this to find the value of $c$ given the interval $[a, b]$.
 
 \section{The Algorithm}\label{sec:algorithm}
 
@@ -39,7 +42,7 @@ The algorithm is informally described as follows:
         \item Otherwise, we check if we should reduce, a.k.a replace the edge with the midpoint, the left part (in the case of $f(a)f(p) < 0$) or the right part ($f(a)f(p) > 0$).
 \end{enumerate}
 
-Notice that the algorithm closelly resembles the idea of Binary Searching from Computer Science, so the analysis will carry on a similar manner.
+Notice that the algorithm closely resembles the idea of Binary Searching from Computer Science, so the analysis will carry on a similar manner.
 
 \section{Analysis of the Algorithm}\label{sec:analysis}
 
@@ -50,20 +53,22 @@ We can define a simple iteration rule: we have a search space $s = b - a$, after
 
 Or written in terms of the binary logarithm with $n$ isolated:
 \begin{equation}\label{eq:upper-bound-bisection-v2}
-  n = \ceil*{\log_2\left(\frac{b - a}{\epsilon}\right)}
+  n \le \ceil*{\log_2\left(\frac{b - a}{\epsilon}\right)}
 \end{equation}
 
 Notice that~\eqref{eq:upper-bound-bisection-v2} provides an upper bound, not the exact amount of iterations required, so we may get better results than the formula might indicate.
 
+Moreover, notice that in~\ref{sec:theory} we stated that there exists \emph{at least} $1$ $c$ such that $f(c) = 0$, not exactly $1$. This means that even tho the Bisection will locate one root correctly there may be more.
+
 \section{Implementation}\label{sec:implementation}
 
-For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. One can find the source code in the GitHub repository ``NumericalMethods''~\cite{repo}, along with the sources of the analysis papers and other methods.
+For the language of choice implementing numerical methods I used GNU Octave~\cite{octave}, as it's built with numerical computations in mind. One can find the source code in the GitHub repository ``numerical\_methods''~\cite{repo}, along with the sources of the analysis papers and other methods.
 
-The implementation is almost a $1 : 1$ translation of the algorithm described earlier, the only change we make is that instead of validating that the interval satisfies $f(a)f(b) < 0$, we check if the signs are the signs are different to avoid a multiplication.
+The implementation is almost a 1 to 1 translation of the algorithm described earlier, the only change we make is that instead of validating that the interval satisfies $f(a)f(b) < 0$, we check if the signs are different to avoid a multiplication.
 
 \section{Results}\label{sec:results}
 
-The final executable can recieve a function, an interval and an $\epsilon$ to return the found root, along with the number of iterations taken and the expected error:
+The final executable can receive a function, an interval and an $\epsilon$ to return the found root, along with the number of iterations taken and the expected error:
 \begin{lstlisting}[caption={Sample execution of the program},label={lst:sample-run}]
 > Enter f(x): x^2 - cos(x)
 > Enter the interval [a, b]: [-0.2, pi / 2]
@@ -80,7 +85,7 @@ In the case above, if we tried our formula for the number of steps, we would hav
 
 \section{Conclusion and Discussion}\label{sec:conlusion}
 
-In conclusion, the Bisection Method is a simple, stable and reliable algorithm to find solutions to equations in the form $f(x) = 0$, however, it is slow compared to other methods like Newton-Raphson, or even derivative-free ones such as the Secant Method. So it serves more as a theorical basis to other methods rather than an actually useful one.
+In conclusion, the Bisection Method is a simple, stable and reliable algorithm to find solutions to equations in the form $f(x) = 0$, however, it is slow compared to other methods like Newton-Raphson, or even derivative-free ones such as the Secant Method. So it serves more as a theoretical basis to other methods rather than an actually useful one.
 
 \bibliographystyle{ieeetr}
 \bibliography{bibliography}

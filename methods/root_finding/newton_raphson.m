@@ -6,12 +6,12 @@ function [root, iter] = newton_raphson(f, f_prime, p0, tol = 1e-6, max_iter = 12
     % Check divergence criteria (derivative close to 0)
     fp = f_prime(p0);
 
-    if abs(fp) < 1e-12
+    if abs(fp) < 1e-6
       warning("newton_raphson:possibleDivergence", "f'(p0) is too small, possible divergence.");
       return;
     endif
 
-    root = p0 - f(p0)/fp;
+    root = p0 - f(p0) / fp;
 
     % Check convergence criteria
     if abs(root - p0) < tol

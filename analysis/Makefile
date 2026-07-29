@@ -7,15 +7,15 @@ PAPER ?=
 all: $(PAPER).pdf
 
 $(PAPER).pdf: $(PAPER).tex bibliography.bib
-	pdflatex $(PAPER).tex 
+	pdflatex -interaction=nonstopmode $(PAPER).tex
 	bibtex $(PAPER)
-	pdflatex $(PAPER).tex
-	pdflatex $(PAPER).tex
+	pdflatex -interaction=nonstopmode $(PAPER).tex
+	pdflatex -interaction=nonstopmode $(PAPER).tex
 
 clean:
 	rm -f *.aux *.bbl *.blg *.log *.out *.toc
 
-distclean: clean
+distclean:
 	rm -f *.pdf
 
 # end

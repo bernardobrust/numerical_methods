@@ -16,26 +16,26 @@
 \maketitle
 
 \begin{abstract}
-  A brief explanation of what numerical methods are and their uses/aplications.
+  A brief explanation of what numerical methods are and their uses/applications.
 \end{abstract}
 
 \section{What and Why are Numerical Methods?}\label{sec:intro}
 
-Numerical Methods arise from the fact that mathematics isn't always perfect, in the sense that not every problem has an exact solution. Equations may not have an exact representation of their solutions, integrals may not have closed form solution, etc.
+Numerical Methods arise from the fact that mathematics isn't always perfect, in the sense that not every problem has an exact solution. Equations may not have an exact representation of their solutions, integrals may not have closed form solution, etc. Moreover, calculating approximations is much faster for a computer to do than solving math problems symbolically, so approximations are required for most real-time software.
 
-To make things clearer, consider the equation $f(x) = x^2 - \cos(x)$ and we need to find it's roots. This is a problem does not have, what we call in math lingo as an \emph{analytical solution}. The root isn't $\sqrt{5} - \sqrt{3}$ or $\pi/e$ or some other stunning relation between loved constants, it's aproximetly $0.824132312301814$. But how does one find such approximation?
+To make things clearer, consider the equation $f(x) = x^2 - \cos(x)$ and we need to find it's roots. This is a problem does not have, what we call in math lingo as an \emph{analytical solution}. The root isn't $\sqrt{5} - \sqrt{3}$ or $\pi/e$ or some other stunning relation between loved constants, it's approximately $0.824132312301814$. This solution is not an approximation of some closed formula involving special constants, it's just the solution value. But how does one find such approximation?
 
-One obvious but extremly inefective way to guess and check: plug in some value for $x$, evalueate, and see how close to $0$ it was. This can \emph{acually} take forever, as the real number line is an infinite search space. So we need a better method.
+One obvious but ineffective way to guess and check: plug in some value for $x$, evaluate, and see how close to $0$ it was. This can \emph{actually} take forever, as the real number line is an infinite search space. So we need a better method.
 
-In the following papers I'll describe (based on the reference book~\cite{book}) and implement (using GNU Octave~\cite{octave}) some important numerical methods for different situations, such as the one described above (for a simple aswer to the problem check ``Bisection'', for a faster but more complex one check ``Newton-Raphson'').
+In the following papers I'll describe (based on the reference book~\cite{book}) and implement (using GNU Octave~\cite{octave}) some important numerical methods for different situations, such as the one described above (for a simple answer to the problem check ``Bisection'', for a faster but more complex one check ``Newton-Raphson'').
 
-One last question the reader might be asking is ``How often do these sorts of problems appear in the real world''? And for an aswer I'd recomend asking your local Engineering student.
+One last question the reader might be asking is ``How often do these sorts of problems appear in the real world''? And for an answer I'd recommend asking your local Engineering student.
 
 \subsection{On Numerical Analysis}\label{sec:further-explanation}
 
-Some may argue that there's a difference between ``Numerical Methods'' and ``Numerical Analysis'' based on rigor, similar to ``Calculus'' and ``Analysis''. In the case of Calculus I can agree, as one focuses on solving integrals and derivatives and the other on writing proofs and asking more abstract questions. Numerical does not have such difference. In the modern day, the purpuse of these thecniques it to run on a computer as doing such methods by hand is as time consuming as it gets, and requires a calculator anyway (try doing 5 iterations of newton's method by hand).
+Some may argue that there's a difference between ``Numerical Methods'' and ``Numerical Analysis'' based on rigor, similar to ``Calculus'' and ``Analysis''. In the case of Calculus I can agree, as one focuses on solving integrals and derivatives and the other on writing proofs and asking more abstract questions. Numerical does not have such difference. In the modern day, the purpose of these techniques it to run on a computer as doing such methods by hand is as time consuming as it gets, and requires a calculator anyway (try doing 5 iterations of newton's method by hand).
 
-So the entire focus shifts from doing calculations to proving and improving methods, which requires thecniques from Analysis and Linear Algebra.
+So the entire focus shifts from doing calculations to proving and improving methods, which requires techniques from Analysis and Linear Algebra.
 
 \section{Structure}\label{sec:intro}
 
