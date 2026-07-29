@@ -8,7 +8,7 @@
 - [ ] Taylor Series Approximation
 
 ### Docs + papers
-- [ ] Intro 2 Numerical Methods
+- [x] Intro 2 Numerical Methods
 - [ ] Secant, analysis
 - [ ] Regula-Falsi, analysis
 - [ ] Steffensen's method, analysis
