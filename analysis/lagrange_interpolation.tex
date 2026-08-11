@@ -1,0 +1,194 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+\title{Analysis of Lagrange Polynomial Interpolation}
+\author{Bernardo Brust}
+
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{plain}
+\newtheorem*{theorem*}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  Analyzing an implementation of Lagrange Polynomial Interpolation for finding unknown points of functions using GNU Octave~\cite{octave} in an informal manner, based on the information provided by the book ``Numerical Analysis''~\cite{book}.
+\end{abstract}
+
+\section{Theoretical Development}\label{sec:intro}
+
+Lagrange's Polynomial Interpolation is a method for aproximating unknown (continuous) functions with some known points using algebraic polynomials. This is possible due to Weierstrass Approximation Theorem:
+
+\begin{theorem*}
+  Weierstrass Approximation Theorem: given a continuous function $f(x)$ that is continuous on a given interval $[a, b]$, for each $\epsilon > 0$ there exists a polynomial $P(x)$ such that:
+  \[
+    |f(x) - P(x)| < \epsilon
+  \]
+\end{theorem*}
+
+The proof of this theorem relies on either Bernstein Polynomials, Binomial Distributions or the Stone-Weierstrass Theorem~\cite{proofwiki-weierstrass_approximation}, so we'll skip it.
+
+Polynomials are a particularly usefull mathematical objects because they are easy to integrate and differentiate, so they are often used to approximate functions.
+
+\subsection{Lagrange Interpolating Polynomials}
+
+The simplest case for interpolation is for $2$ points $(x_0, y_0), (x_1, y_1)$. So our goal is to find some polynomial function $f$ such that $f(x_0) = y_0$ and $f(x_1) = y_1$. Here's where the Lagrange polynomials:
+
+\[
+  L_0(x) = \frac{x - x_1}{x_0 - x_1}, L_1(x) = \frac{x - x_0}{x_0 - x_1}
+\]
+
+And the Lagrange interpolating polynomials:
+
+\[
+  P(x) = L_0f(x_0) + L_1f(x_1)
+\]
+
+Note that:
+
+\begin{gather*}
+    P(x_0) = y_0 \\
+    P(x_1) = y_1
+\end{gather*}
+
+So $P(x)$ is indeed a polynomial that contains the desired points. Of course we want the formula to work for more than $2$ points, so we want a general structure for $n + 1$ points (a polynomial of degree $n$ has $n + 1$ degrees of freedom). So we want:
+
+\[
+  P(x_i) = y_i
+\]
+
+At all points. For this we want a collection of special coeficients of $y_0, y_1, \dots$ such that they are $1$ at the corresponding $x$ and $0$ otherwise:
+
+\[
+  L_i(x_j) =
+  \begin{cases}
+  1, j = i\\
+  0, j \ne i
+  \end{cases}
+\]
+
+Note that this structure is similar to a Kronecker delta function. The easiest way to build such polynomial is by the factorisation of the roots:
+
+\[
+  (x - x_0)(x - x_1)(x - x_2)\dots(x - x_n)
+\]
+
+But of course this polynomial does not yield only the zeros and ones nescessarily, so we normalize them:
+
+\[
+  L_i(x) = \prod_{i \ne j} \frac{x - x_j}{x_i - x_j}
+\]
+
+We have to exclude $i = j$ to avoid division by zero. Now we can get the terms together:
+
+\[
+  P(x) = \sum_{i = 0}^n y_i \prod_{i \ne j} \frac{x - x_j}{x_i - x_j}
+\]
+
+\begin{equation}\label{eq:lagrange_interpolation_formula}
+  P(x) = L_0f(x_0) + L_1f(x_1) + \dots + L_nf(x_n)
+\end{equation}
+
+\subsection{Further Investigation of Lagrange Interpolating Polynomials}
+
+There are a few interesting facts about this formula. Notably, we saw that $L_i(x_j)$ acts similarly to a Kronecker delta. Indeed, when $x$ is equal to any $x_i$ we get $L_i = 1$ and all other $L_{j \ne i} = 0$ leaving the polynomial as
+
+\[
+  P(x) = f(x_i)
+\]
+
+Which is exactly what we want. Moreover, one can ensure that
+
+\[
+  \sum_{i = 0}^n L_i(x) = 1
+\]
+
+\begin{proof}
+Let $Q(x) = \sum_{i = 0}^n L_i(x)$, if $x$ is any $x_i$ we have $Q(x_i) = 1$ as $L_i(x_j)$ behaves as a Kronecker delta. So we have that
+
+\[
+  Q(x_0) = Q(x_1) = \dots = Q(x_n) = 1
+\]
+
+So $Q$ is a polynomial of degree at most $n$ (by definition of $L_i$) and agrees on $n + 1$ points with the constant polynomial $R(x) = 1$. So by the Fundamental Theorem of Algebra $R(x) = Q(x)$.
+\end{proof}
+
+This fact shows some interesting proprties of interpolation:
+\begin{enumerate}
+        \item Constants stay constant: if $y_0 = y_1 = \dots = C$ then $P(x) = \sum_i y_iL_i(x) = C \sum_iL_i(x) = C$
+        \item Translation invariance: if a constant $+ C$ is added to the function, for a new output point $z_z$ defined as $y_i = y_i + C$, then the new polynomial $G(x)$ is defined as $G(x) = \sum_i y_iL_i(x) + C\sum_iL_i(x) = P(x) + C$
+        \item A collection of functions ${f_i(x)}$ that satisfies $\sum_i f_i(x) = 1$ is called a ``partition of unity''. It has multiple aplications in computer science, specially computer graphics for blending colors and geometry. So this idea is deeper than just this one method.
+\end{enumerate}
+
+\section{The Algorithm}\label{sec:algorithm}
+
+The theory section of this analysis was a lot longer than that of other methods like Newton's, but it's algorithm section will be the shortest:
+
+\begin{enumerate}\label{alg:lagrange_alg}
+        \item Calculate $P(x)$ at the interest point $x_p$.
+\end{enumerate}
+
+Yes, the algorim is just a straight forward calculation. No loops and no conditions.
+
+\section{Analysis of the Algorithm}\label{sec:analysis}
+
+The good thing about an algorithm so simple is that we can get the exact amount of mathematical operations used to calculate it. As the inputs will be the data points ($xs$ and $ys$ of length $n$) and the point of interest $x$ we can calculate as a function of $n$: we have $n + 1$ outer terms, with $n$ factors each (since we skip $i = j$), each factor does $2$ subtractions and $1$ division, so $3n(n + 1)$. Then we multiply $n$ factors for each $1$: $n(n + 1)$, multiply them for another $n + 1$ operations and sum the $n + 1$ tems for $n$ additions, in total:
+
+\[
+  3n(n + 1) + n(n + 1) + n + 1 + n = 4n^2 + 6n + 1
+\]
+
+Now note that unlike root-finding algorithms the interpolation ones do not take an $\epsilon$ as input, hence we need to calculate an error by hand.
+
+\subsection{Error Analysis}\label{sec:error}
+
+The error term for the approximation $P(x)$ of $f$ (assuming $f \in C^{n + 1}[a, b]$) using $n$ data points is defined as:
+
+\[
+  E_l(x) = \frac{f^{(n + 1)}(\xi(x))}{(n + 1)!}(x - x_0)(x - x_1)\dots(x - x_n)
+\]
+
+Notice that it is almost the same as the error term for Taylor's expasion:
+
+\[
+  E_t(x) = \frac{f^{(n + 1)}(\xi(x))}{(n + 1)!}(x - x_0)^{n + 1}
+\]
+
+The proof for this relies on the Generalized Rolle's Theorem and the discussion about the amount of roots. I won't present the proof here as it's quite long, but it's worth checking out.
+
+The convergence rate of polynomial interpolation depends on both the smoothness of the interpolated function and the choice of interpolation points. For sufficiently smooth functions and appropriately chosen nodes, such as Chebyshev nodes (which we won't discuss), the interpolation error can decrease rapidly as the polynomial degree increases. However, using equally spaced nodes can lead to oscillations and poor convergence for higher-degree polynomials, as demonstrated by Runge's phenomenon (which also won't be discussed). So it's not possible to determine a formula or order of convergence similar to the ones presented on the papers on the root finding methods.
+
+\section{Implementation}\label{sec:implementation}
+
+For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. The source code can be found in the GitHub repository ``numerical\_methods''~\cite{repo}, along with the sources of the analysis papers and other methods.
+
+The implementation follows the algorithm described in Section~\ref{sec:algorithm}. The algorithm is so simple that one could actually write the entire code in one line, but that would obviously obfuscate the code for no reason. So the code is split into ``lagrange'' and ``L'' for clarity. One detail is that our formula is ``0-indexed'' but GNU Octave is ``1-indexed'', so our ranges are $[1, \rho(xs)]$ instead of the tipical $[0, \rho(xs))$.
+
+\section{Results}\label{sec:results}
+
+The final executable recieves $xs$ and $ys$, the data points and $x$, the point to calculate $P$ at.
+
+\begin{lstlisting}[caption={Sample execution of the program},label={lst:sample-run}]
+> Enter the x values [x0, x1, ... xn]: [1, 2, 3, 4, 5]
+> Enter the y values [y0, y1, ... yn]: [0.4,4.4,9.9,16.6,24.7]
+> Enter the point where you want f(x) to be evaluated: 2.3
+f(2.300000) = 5.915818749999999
+\end{lstlisting}
+
+Notice the one decimal place on the $y$ values.
+
+\section{Conclusion and Discussion}\label{sec:conlusion}
+
+Since its computational cost is predictable and it provides sufficient accuracy, Lagrange interpolation is well-suited to real-time applications. Moreover, it's simple to implement and provides a great theoretical basis for other, more complex interpolation methods such as spline interpolation.
+
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
+
+\end{document}
