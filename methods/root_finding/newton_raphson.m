@@ -29,10 +29,10 @@ expr = input("Enter f(x): ", "s");
 f = eval(["@(x) " expr]);
 
 % Taking the derivative of f
-auto = yes_or_no("How would you like automatic derivation? ");
+auto = yes_or_no("Would you like automatic derivation? (requires sympy) ");
 if auto
   % We require the symbolic package for taking the derivative of the function
-  % You may need to load sympy into your envirioment with something like:
+  % You may need to load sympy into your environment with something like:
   % "> source ~/venvs/sympy/bin/activate"
   pkg load symbolic
   syms x
