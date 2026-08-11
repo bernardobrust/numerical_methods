@@ -28,3 +28,8 @@ Methods for solving equations in the form $f(x) = 0$.
 
 - [Bisection](methods/root_finding/bisection.m): Basically binary search for finding zeros of functions, it's slow, but it's reliable.
 - [Newton-Raphson](methods/root_finding/newton_raphson.m): A **blazingly fast** method that uses interesting propreties of derivatives and Taylor Series to accelerate convergence, doesen't always work tho.
+
+### Interpolation
+Methods for approximating unknown values of unknown functions using known data points.
+
+- [Lagrange's Approximating Polynomials](methods/interpolation/lagrange.m): The simplest form of polynomial interpolation.
