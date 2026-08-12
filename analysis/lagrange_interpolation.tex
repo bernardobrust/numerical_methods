@@ -127,6 +127,69 @@ This fact shows some interesting proprties of interpolation:
         \item A collection of functions ${f_i(x)}$ that satisfies $\sum_i f_i(x) = 1$ is called a ``partition of unity''. It has multiple aplications in computer science, specially computer graphics for blending colors and geometry. So this idea is deeper than just this one method.
 \end{enumerate}
 
+\subsection{Error Analysis}\label{sec:error}
+
+Unlike root-finding algorithms, the interpolation ones do not take an $\epsilon$ as input, hence we need to calculate an error by hand.
+
+The error term for the approximation $P(x)$ of $f$ (assuming $f \in C^{n + 1}[a, b]$) using $n$ data points is defined as:
+
+\[
+  E_l(x) = \frac{f^{(n + 1)}(\xi(x))}{(n + 1)!}(x - x_0)(x - x_1)\dots(x - x_n)
+\]
+
+Notice that it is almost the same as the error term for Taylor's expasion:
+
+\[
+  E_t(x) = \frac{f^{(n + 1)}(\xi(x))}{(n + 1)!}(x - x_0)^{n + 1}
+\]
+
+The proof for this relies on the Generalized Rolle's Theorem and the discussion about the amount of roots.
+
+\begin{proof}
+  If $x$ is any of the given $x_i$ points then the error will be zero as expected. Consider now that $x \ne x_i$, we define
+  \[
+    E(x) = f(x) - P_n(x)
+  \]
+  It's trivial to see that $E(x)$ has $n + 1$ roots (there are $n + 1$ given data points), so we can define one of the roots of the error as
+  \[
+    w(t) = \prod_{i = 0}^n (t - x_i)
+  \]
+  From where we can define a function $g(t)$ with this term
+  \[
+    g(t) = f(t) - P_n(t) Cw(t)
+  \]
+  If we choose a $C$ such that $g(t) = 0$, so $C = \frac{E(t)}{w(t)}$, moreover, we have $g(x_i) = 0$ and $w(x_i) = 0$, so $g$ has $n + 2$ roots:
+  \[
+    x_0, x_1, \dots, x_n, t
+  \]
+  Now assuming that $f \in C^{n + 1}$, Rolle's theorem ensures that $g'$ has at least $n + 1$ roots, and $g''$ has $n$ roots, and so on. Hence there exists one $\xi$ such that
+  \[
+    g^{n + 1}(\xi) = 0
+  \]
+  This derivative is
+  \[
+    g^{n + 1}(\xi) = f^{x + 1}(\xi) - P_n^{n + 1}(\xi) - Cw^{n + 1}(\xi)
+  \]
+  But $P_n$ has at most degree $n$ to $P_n^{n + 1}(\xi) = 0$, and $w(\xi)$ is a monic polynomial (that is, the coeficient of the highest nonzero term is 1), so it's $n + 1$ derivative is $(n + 1)!$. Lastly, we know $g^{n + 1}(\xi) = 0$, therefore the equation becomes
+  \begin{gather*}
+    f^{x + 1}(\xi) - C(n + 1)! = 0 \\
+    C = \frac{f^{x + 1}(\xi)}{(n + 1)!}
+  \end{gather*}
+  Now recalling our definition of $C$ as $\frac{E(t)}{w(t)}$, we can now use $t = x$ and expand $w$ to get the formula
+  \begin{gather*}
+    \frac{E(x)}{w(x)} = \frac{f^{x + 1}(\xi)}{(n + 1)!} \\
+    E(x) = \frac{f^{x + 1}(\xi)}{(n + 1)!} \prod_{i = 0}^n (x - x_i)
+  \end{gather*}
+\end{proof}
+
+\subsection{Convergence Rate}
+
+The convergence rate of polynomial interpolation depends on both the smoothness of the interpolated function and the choice of interpolation points, so it's not trivial to define a rate of convergence for this method. Specifically, there is a phenomenon in Numerical Analysis called Runge's phenomenon, which states that polynimal interpolation on equidistant points causes ocilations at the edges of the interval. Runge's phenomenon is not guaranteed to happen, but it's frequent enough to call it one of the problems in polynomial interpolation. Furthermore, higher degree interpolations are not certain to increase accuracy (this will latter lead us to Neville's method).
+
+There are strategies to mitigate this issue such as using Chebyshev nodes, but that's beyond the scope of this analysis.
+
+\subsection{Neville's Method}
+
 \section{The Algorithm}\label{sec:algorithm}
 
 The theory section of this analysis was a lot longer than that of other methods like Newton's, but it's algorithm section will be the shortest:
@@ -144,26 +207,6 @@ The good thing about an algorithm so simple is that we can get the exact amount 
 \[
   3n(n + 1) + n(n + 1) + n + 1 + n = 4n^2 + 6n + 1
 \]
-
-Now note that unlike root-finding algorithms the interpolation ones do not take an $\epsilon$ as input, hence we need to calculate an error by hand.
-
-\subsection{Error Analysis}\label{sec:error}
-
-The error term for the approximation $P(x)$ of $f$ (assuming $f \in C^{n + 1}[a, b]$) using $n$ data points is defined as:
-
-\[
-  E_l(x) = \frac{f^{(n + 1)}(\xi(x))}{(n + 1)!}(x - x_0)(x - x_1)\dots(x - x_n)
-\]
-
-Notice that it is almost the same as the error term for Taylor's expasion:
-
-\[
-  E_t(x) = \frac{f^{(n + 1)}(\xi(x))}{(n + 1)!}(x - x_0)^{n + 1}
-\]
-
-The proof for this relies on the Generalized Rolle's Theorem and the discussion about the amount of roots. I won't present the proof here as it's quite long, but it's worth checking out.
-
-The convergence rate of polynomial interpolation depends on both the smoothness of the interpolated function and the choice of interpolation points. For sufficiently smooth functions and appropriately chosen nodes, such as Chebyshev nodes (which we won't discuss), the interpolation error can decrease rapidly as the polynomial degree increases. However, using equally spaced nodes can lead to oscillations and poor convergence for higher-degree polynomials, as demonstrated by Runge's phenomenon (which also won't be discussed). So it's not possible to determine a formula or order of convergence similar to the ones presented on the papers on the root finding methods.
 
 \section{Implementation}\label{sec:implementation}
 
