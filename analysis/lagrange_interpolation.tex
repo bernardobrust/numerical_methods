@@ -182,7 +182,7 @@ The proof for this relies on the Generalized Rolle's Theorem and the discussion 
   \end{gather*}
 \end{proof}
 
-\subsection{Convergence Rate}
+\subsection{Convergence Rate}\label{sec:convergence_rate}
 
 The convergence rate of polynomial interpolation depends on both the smoothness of the interpolated function and the choice of interpolation points, so it's not trivial to define a rate of convergence for this method. Specifically, there is a phenomenon in Numerical Analysis called Runge's phenomenon, which states that polynimal interpolation on equidistant points causes ocilations at the edges of the interval. Runge's phenomenon is not guaranteed to happen, but it's frequent enough to call it one of the problems in polynomial interpolation. Furthermore, higher degree interpolations are not certain to increase accuracy (this will latter lead us to Neville's method).
 
@@ -190,46 +190,132 @@ There are strategies to mitigate this issue such as using Chebyshev nodes, but t
 
 \subsection{Neville's Method}
 
-\section{The Algorithm}\label{sec:algorithm}
+One of the problems with Lagrange interpolation is that it is dificult to apply the error term we calculated, since the function itself is tipically unknown. So it's tipically required to compute multiple arangements of data points $P_{i, j, k \dots}$ (Polynomial $P$ constructed using $x_i, x_j, \dots$) to know which one provides the best approximation. However, doing so with repeated Lagrange polynomials in different arrangements is a lot of work: there's no way to ``recycle'' the previous result to calculate the next with our current formula. But we're dealing with polynomials, it is likely that there is a connection between terms, say, $P_{i, j, k}$ and $P_{i, j, k, l}$.
 
-The theory section of this analysis was a lot longer than that of other methods like Newton's, but it's algorithm section will be the shortest:
+This is where Neville's Method comes in: it establishes a relation between the polynomials, allowing for iterative calculations. Here's the relation:
+
+\[
+  P(x) = \frac{(x - x_j)P_{0, 1, \dots, j - i, j + 1, \dots k}(x) - (x - x_i)P_{0, 1, \dots, i - i, i + 1, \dots k}(x)}{x_i - x_j}
+\]
+
+Where $P$ is the k-th Lagrange polynomial that interpolates $f$ at $k + 1$ points $x_0 \dots x_k$.
+
+The big indicie on $P$ indicates that we are excluding the j-th and i-th points from the interpolation. The proof for this formula is just algebraic manipulations so we'll skip it.
+
+An interesting proprety of this representation of $P$ is that it allows one to express a term with one more data point in terms of the one with less as follows:
+
+\begin{gather*}
+  P_{0, 1} = \frac{(x - x_0)P_{1}(x) - (x - x_1)P_{0}(x)}{x_1 - x_0} \\
+  P_{1, 2} = \frac{(x - x_1)P_{2}(x) - (x - x_2)P_{1}(x)}{x_2 - x_1} \\
+  P_{0, 1, 2} = \frac{(x - x_0)P_{1, 2}(x) - (x - x_2)P_{0, 1}(x)}{x_2 - x_0} \\
+  \vdots
+\end{gather*}
+
+Using this method to calculate Lagrange polynomials is called Neville's Method. We can simplify and generalize it using some notation:
+
+\[
+  Q_{i, j} = P_{i - j, i - j + 1, \dots, i - 1, i}
+\]
+
+And given $n$ data points we get all polynomials entries in a sparse matrix as
+
+\[
+  \begin{bmatrix}
+    Q_{0, 0} \\
+    Q_{0, 1} & Q_{1, 1} \\
+    Q_{0, 2} & Q_{1, 2} & Q_{2, 2} \\
+    Q_{0, 3} & Q_{1, 3} & Q_{2, 3} & Q_{3, 3} \\
+    \vdots & & & & \ddots
+  \end{bmatrix}
+\]
+
+We'll build this matrix in the next session.
+
+\section{The Algorithms}\label{sec:algorithm}
+
+We'll have two algorithms in this section. The straight forward Lagrange Interpolating Polynomial of the highest degree, implemented as ``lagrange.m'' in the repository (see Section~\ref{sec:implementation} for further details), and Neiville's Method.
+
+\subsection{Lagrange Interpolating Polynomial}
 
 \begin{enumerate}\label{alg:lagrange_alg}
         \item Calculate $P(x)$ at the interest point $x_p$.
 \end{enumerate}
 
-Yes, the algorim is just a straight forward calculation. No loops and no conditions.
+Yes, the algorim is just a straight forward calculation. Not very interesting compared to the amount of theory that lead to it.
 
-\section{Analysis of the Algorithm}\label{sec:analysis}
+\subsection{Neville's Method}
+
+\begin{enumerate}\label{alg:neville_alg}
+        \item Initialize a table $Qs$ with dimensions $n$ by $n$ and the first collumn as the $y$ values of the data points
+        \item For each $i$ from $1$ to $n$, assign $Qs_{i, j}$ to $Q_{i, j}$ for each $f$ from $1$ to $i$
+\end{enumerate}
+
+Note that Neville's algorithms is a textbook example of an iterative method, computing the next term based on the previous ones.
+
+\section{Analysis of the Algorithms}\label{sec:analysis}
+
+\subsection{Lagrange Interpolating Polynomial}
 
 The good thing about an algorithm so simple is that we can get the exact amount of mathematical operations used to calculate it. As the inputs will be the data points ($xs$ and $ys$ of length $n$) and the point of interest $x$ we can calculate as a function of $n$: we have $n + 1$ outer terms, with $n$ factors each (since we skip $i = j$), each factor does $2$ subtractions and $1$ division, so $3n(n + 1)$. Then we multiply $n$ factors for each $1$: $n(n + 1)$, multiply them for another $n + 1$ operations and sum the $n + 1$ tems for $n$ additions, in total:
 
 \[
-  3n(n + 1) + n(n + 1) + n + 1 + n = 4n^2 + 6n + 1
+  3n(n + 1) + n(n + 1) + n + 1 + n = 4n^2 + 6n + 1 \in O(n^2)
 \]
 
-\section{Implementation}\label{sec:implementation}
+\subsection{Neville's Method}
+
+Neville's is harder to calculate the exact number of mathematical operations, but we can see it's order of complexity is bounded above by $n^2$ calculations of $Q$, which is constant time, so $\text{Neville} \in O(n^2)$. So the asymtotic complexity of these algorithms is the same, with Neville's providing more information about the approximations, even if overall it does more calculations.
+
+\section{Implementations}\label{sec:implementation}
 
 For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. The source code can be found in the GitHub repository ``numerical\_methods''~\cite{repo}, along with the sources of the analysis papers and other methods.
 
-The implementation follows the algorithm described in Section~\ref{sec:algorithm}. The algorithm is so simple that one could actually write the entire code in one line, but that would obviously obfuscate the code for no reason. So the code is split into ``lagrange'' and ``L'' for clarity. One detail is that our formula is ``0-indexed'' but GNU Octave is ``1-indexed'', so our ranges are $[1, \rho(xs)]$ instead of the tipical $[0, \rho(xs))$.
+The implementations follow the algorithms described in Section~\ref{sec:algorithm}. The algorithm for Lagrange is so simple that one could actually write the entire code in one line, but that would obviously obfuscate the code for no reason. So the code is split into ``lagrange'' and ``L'' for clarity.
+
+One detail is that our formulas are ``0-indexed'' but GNU Octave is ``1-indexed'', so our ranges are $[1, \rho(xs)]$ instead of the tipical $[0, \rho(xs))$. Specifically, in Neville's method we have to take $j = 1$ as a special case to avoid indexing invaid entries in the table. Moreover, empty entries are treated as zero instead of just being left empty.
 
 \section{Results}\label{sec:results}
 
-The final executable recieves $xs$ and $ys$, the data points and $x$, the point to calculate $P$ at.
+\subsection{Lagrange's}
 
-\begin{lstlisting}[caption={Sample execution of the program},label={lst:sample-run}]
-> Enter the x values [x0, x1, ... xn]: [1, 2, 3, 4, 5]
-> Enter the y values [y0, y1, ... yn]: [0.4,4.4,9.9,16.6,24.7]
-> Enter the point where you want f(x) to be evaluated: 2.3
-f(2.300000) = 5.915818749999999
+The final executable for Lagrange recieves $xs$ and $ys$, the data points and $x$, the point to calculate $P$ at.
+
+\begin{lstlisting}[caption={First execution of Lagrange's}]
+> Enter the x values [x0, x1, ... xn]: [0, 2, 5, 9]
+> Enter the y values [y0, y1, ... yn]: [-1.00, 4.41, 24.71, 81.91]
+> Enter the point where you want f(x) to be estimated: 3.3
+f(3.300000) is approximatly 11.19759776190476
 \end{lstlisting}
 
-Notice the one decimal place on the $y$ values.
+\begin{lstlisting}[caption={Second execution of Lagrange's}]
+> Enter the x values [x0, x1, ... xn]: [0, 1, 2, 3]
+> Enter the y values [y0, y1, ... yn]: [-1.00, 0.45, 4.41, 9.98]
+> Enter the point where you want f(x) to be estimated: 3.3
+f(3.300000) is approximatly 11.83040000000000
+\end{lstlisting}
+
+The actual value for $f(x) = x^2 - cos(x)$ at $3.3$ is $11.877479769908863$. Notice that even tho we used the same amount of points, having them in different places yeilds different results. Empirically proving the point made under subsection~\ref{sec:convergence_rate}.
+
+\subsection{Neville's}
+
+\begin{lstlisting}[caption={First execution of Nevilles's}]
+> Enter the x values [x0; x1; ... xn]: [0; 1; 2; 3; 4]
+> Enter the y values [y0; y1; ... yn]: [-1.0000; 0.4596; 4.4161; 9.9899; 16.6536]
+> Enter the point where you want f(x) to be estimated: 1.64
+Final table:
+   -1.0000         0         0         0         0
+    0.4596    1.3937         0         0         0
+    4.4161    2.9918    2.7041         0         0
+    9.9899    2.4095    2.8054    2.7595         0
+   16.6536    0.9273    2.6763    2.7779    2.7671
+Interpolated value (max degree) at x = 1.64: 2.767052
+\end{lstlisting}
+
+The actual value for $f(x) = x^2 - cos(x)$ at $1.64$ is $2.7587484486540617$, the best approximation is $2.7595$, with error $(4.5155)10^{-4}$, versus the highest polynomial's $(8.3515)10^{-3}$. Empirically proving the point made under the subsection~\ref{sec:convergence_rate}.
 
 \section{Conclusion and Discussion}\label{sec:conlusion}
 
-Since its computational cost is predictable and it provides sufficient accuracy, Lagrange interpolation is well-suited to real-time applications. Moreover, it's simple to implement and provides a great theoretical basis for other, more complex interpolation methods such as spline interpolation.
+Lagrange's interpolation is a tool used for finding polynomial approximations to unknown functions given a set of known data points. It's a real-world tool for multiple areas (such as Cryptography and Digital Signal Processing) and has an interesting methematical derivation and consequences.
 
 \bibliographystyle{ieeetr}
 \bibliography{bibliography}
