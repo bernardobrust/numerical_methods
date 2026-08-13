@@ -1,4 +1,7 @@
-% Theory + analysis under way
+% Lagrange Interpolation
+% This file calculates using the highest degree polynomial, which is not always
+% the best approximation
+% Theory + analysis at analysis/lagrange.tex
 
 % The book uses 0-indexed formulas, but Octave is 1-indexed
 % Lagrange polynomial
@@ -7,7 +10,8 @@ function [lp] = L (n, k, x, xs)
   % 1. "arrayfun" is basically a list comprehension from functional languages
   % 2. "ifelse" is a ternary operator
   % This is basically a product notation
-  lp = prod (arrayfun (@(i) ifelse (i != k, (x - xs(i)) / (xs(k) - xs(i)), 1), 1:n));
+  lp = prod (arrayfun (@(i) ifelse (i != k, (x - xs(i)) / (xs(k) - xs(i)), 1),
+            1:n));
 endfunction
 
 function [lag] = lagrange (x, xs, ys)
@@ -22,9 +26,9 @@ if length (xs) != length( ys)
   error ("Different amount of x points and y points");
 endif
 
-x = input ("Enter the point where you want f(x) to be evaluated: ");
+x = input ("Enter the point where you want f(x) to be estimated: ");
 
 r = lagrange (x, xs, ys);
 
 format long
-printf ("f(%f) = ", x), disp (r);
+printf ("f(%f) is approximatly ", x), disp (r);

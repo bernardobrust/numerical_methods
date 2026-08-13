@@ -168,17 +168,17 @@ The proof for this relies on the Generalized Rolle's Theorem and the discussion 
   \]
   This derivative is
   \[
-    g^{n + 1}(\xi) = f^{x + 1}(\xi) - P_n^{n + 1}(\xi) - Cw^{n + 1}(\xi)
+    g^{n + 1}(\xi) = f^{(n + 1)}(\xi) - P_n^{(n + 1)}(\xi) - Cw^{(n + 1)}(\xi)
   \]
-  But $P_n$ has at most degree $n$ to $P_n^{n + 1}(\xi) = 0$, and $w(\xi)$ is a monic polynomial (that is, the coeficient of the highest nonzero term is 1), so it's $n + 1$ derivative is $(n + 1)!$. Lastly, we know $g^{n + 1}(\xi) = 0$, therefore the equation becomes
+  But $P_n$ has at most degree $n$ to $P_n^{(n + 1)}(\xi) = 0$, and $w(\xi)$ is a monic polynomial (that is, the coeficient of the highest nonzero term is 1), so it's $n + 1$ derivative is $(n + 1)!$. Lastly, we know $g^{n + 1}(\xi) = 0$, therefore the equation becomes
   \begin{gather*}
-    f^{x + 1}(\xi) - C(n + 1)! = 0 \\
-    C = \frac{f^{x + 1}(\xi)}{(n + 1)!}
+    f^{(n + 1)}(\xi) - C(n + 1)! = 0 \\
+    C = \frac{f^{(n + 1)}(\xi)}{(n + 1)!}
   \end{gather*}
   Now recalling our definition of $C$ as $\frac{E(t)}{w(t)}$, we can now use $t = x$ and expand $w$ to get the formula
   \begin{gather*}
-    \frac{E(x)}{w(x)} = \frac{f^{x + 1}(\xi)}{(n + 1)!} \\
-    E(x) = \frac{f^{x + 1}(\xi)}{(n + 1)!} \prod_{i = 0}^n (x - x_i)
+    \frac{E(x)}{w(x)} = \frac{f^{(n + 1)}(\xi)}{(n + 1)!} \\
+    E(x) = \frac{f^{(n + 1)}(\xi)}{(n + 1)!} \prod_{i = 0}^n (x - x_i)
   \end{gather*}
 \end{proof}
 
