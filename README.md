@@ -33,3 +33,4 @@ Methods for solving equations in the form $f(x) = 0$.
 Methods for approximating unknown values of unknown functions using known data points.
 
 - [Lagrange's Approximating Polynomials](methods/interpolation/lagrange.m): The simplest form of polynomial interpolation.
+- [Neiville's Method](methods/interpolation/neville.m): Method built over Lagrange's to also compute lower degree polynomials that may yeild better approximations.

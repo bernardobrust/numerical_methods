@@ -19,27 +19,27 @@
 \maketitle
 
 \begin{abstract}
-  Analyzing an implementation of Lagrange Polynomial Interpolation for finding unknown points of functions using GNU Octave~\cite{octave} in an informal manner, based on the information provided by the book ``Numerical Analysis''~\cite{book}.
+  This paper informally analyzes an implementation of Lagrange polynomial interpolation for approximating unknown values of continuous functions from known data points using GNU Octave~\cite{octave}, based on the information provided by the book ``Numerical Analysis''~\cite{book}.
 \end{abstract}
 
 \section{Theoretical Development}\label{sec:intro}
 
-Lagrange's Polynomial Interpolation is a method for aproximating unknown (continuous) functions with some known points using algebraic polynomials. This is possible due to Weierstrass Approximation Theorem:
+Lagrange polynomial interpolation is a method for approximating unknown continuous functions from known data points using algebraic polynomials. This is possible due to the Weierstrass Approximation Theorem:
 
 \begin{theorem*}
-  Weierstrass Approximation Theorem: given a continuous function $f(x)$ that is continuous on a given interval $[a, b]$, for each $\epsilon > 0$ there exists a polynomial $P(x)$ such that:
+  Weierstrass Approximation Theorem: given a continuous function $f(x)$ on an interval $[a, b]$, for each $\epsilon > 0$ there exists a polynomial $P(x)$ such that, for all $x \in [a, b]$,
   \[
     |f(x) - P(x)| < \epsilon
   \]
 \end{theorem*}
 
-The proof of this theorem relies on either Bernstein Polynomials, Binomial Distributions or the Stone-Weierstrass Theorem~\cite{proofwiki-weierstrass_approximation}, so we'll skip it.
+The proof of this theorem relies on Bernstein polynomials, binomial distributions, or the Stone-Weierstrass Theorem~\cite{proofwiki-weierstrass_approximation}, so we will skip it.
 
-Polynomials are a particularly usefull mathematical objects because they are easy to integrate and differentiate, so they are often used to approximate functions.
+Polynomials are particularly useful mathematical objects because they are easy to integrate and differentiate, so they are often used to approximate functions.
 
 \subsection{Lagrange Interpolating Polynomials}
 
-The simplest case for interpolation is for $2$ points $(x_0, y_0), (x_1, y_1)$. So our goal is to find some polynomial function $f$ such that $f(x_0) = y_0$ and $f(x_1) = y_1$. Here's where the Lagrange polynomials:
+The simplest case for interpolation uses $2$ points $(x_0, y_0), (x_1, y_1)$. Our goal is to find a polynomial function $f$ such that $f(x_0) = y_0$ and $f(x_1) = y_1$. This is where the Lagrange polynomials come in:
 
 \[
   L_0(x) = \frac{x - x_1}{x_0 - x_1}, L_1(x) = \frac{x - x_0}{x_1 - x_0}
@@ -48,7 +48,7 @@ The simplest case for interpolation is for $2$ points $(x_0, y_0), (x_1, y_1)$. 
 And the Lagrange interpolating polynomials:
 
 \[
-  P(x) = L_0f(x_0) + L_1f(x_1)
+  P(x) = L_0(x)f(x_0) + L_1(x)f(x_1)
 \]
 
 Note that:
@@ -64,7 +64,7 @@ So $P(x)$ is indeed a polynomial that contains the desired points. Of course we 
   P(x_i) = y_i
 \]
 
-At all points. For this we want a collection of special coeficients of $y_0, y_1, \dots$ such that they are $1$ at the corresponding $x$ and $0$ otherwise:
+at all points. For this, we want a collection of special coefficients for $y_0, y_1, \dots$ such that they are $1$ at the corresponding $x_j$ and $0$ otherwise:
 
 \[
   L_i(x_j) =
@@ -74,62 +74,62 @@ At all points. For this we want a collection of special coeficients of $y_0, y_1
   \end{cases}
 \]
 
-Note that this structure is similar to a Kronecker delta function. The easiest way to build such polynomial is by the factorisation of the roots:
+Note that this structure is similar to a Kronecker delta function. The easiest way to build such a polynomial is by factoring its roots:
 
 \[
   (x - x_0)(x - x_1)(x - x_2)\dots(x - x_n)
 \]
 
-But of course this polynomial does not yield only the zeros and ones nescessarily, so we normalize them:
+However, this polynomial does not necessarily yield only zeros and ones, so we normalize it:
 
 \[
-  L_i(x) = \prod_{i = 0, i \ne j}^{n} \frac{x - x_j}{x_i - x_j}
+  L_i(x) = \prod_{\substack{j = 0 \\ j\ne i}}^n \frac{x - x_j}{x_i - x_j}
 \]
 
-We have to exclude $i = j$ to avoid division by zero. Now we can get the terms together:
+We have to exclude $i = j$ to avoid division by zero. Now we can combine the terms:
 
 \[
-  P(x) = \sum_{i = 0}^n y_i \prod_{i = 0, i \ne j}^{n} \frac{x - x_j}{x_i - x_j}
+  P(x) = \sum_{i = 0}^n y_i \prod_{\substack{j = 0 \\ j\ne i}}^n \frac{x - x_j}{x_i - x_j}
 \]
 
 \begin{equation}\label{eq:lagrange_interpolation_formula}
-  P(x) = L_0f(x_0) + L_1f(x_1) + \dots + L_nf(x_n)
+  P(x) = L_0(x)f(x_0) + L_1(x)f(x_1) + \dots + L_n(x)f(x_n)
 \end{equation}
 
 \subsection{Further Investigation of Lagrange Interpolating Polynomials}
 
-There are a few interesting facts about this formula. Notably, we saw that $L_i(x_j)$ acts similarly to a Kronecker delta. Indeed, when $x$ is equal to any $x_i$ we get $L_i = 1$ and all other $L_{j \ne i} = 0$ leaving the polynomial as
+There are a few interesting facts about this formula. Notably, we saw that $L_i(x_j)$ acts similarly to a Kronecker delta. Indeed, when $x$ is equal to any $x_i$, we get $L_i(x_i) = 1$ and all other $L_j(x_i) = 0$, leaving the polynomial as
 
 \[
   P(x) = f(x_i)
 \]
 
-Which is exactly what we want. Moreover, one can ensure that
+which is exactly what we want. Moreover, we can show that
 
 \[
   \sum_{i = 0}^n L_i(x) = 1
 \]
 
 \begin{proof}
-Let $Q(x) = \sum_{i = 0}^n L_i(x)$, if $x$ is any $x_i$ we have $Q(x_i) = 1$ as $L_i(x_j)$ behaves as a Kronecker delta. So we have that
+Let $Q(x) = \sum_{i = 0}^n L_i(x)$. If $x$ is any $x_i$, then $Q(x_i) = 1$ because $L_i(x_j)$ behaves as a Kronecker delta. Therefore,
 
 \[
   Q(x_0) = Q(x_1) = \dots = Q(x_n) = 1
 \]
 
-So $Q$ is a polynomial of degree at most $n$ (by definition of $L_i$) and agrees on $n + 1$ points with the constant polynomial $R(x) = 1$. So by the Fundamental Theorem of Algebra $R(x) = Q(x)$.
+The polynomial $Q - R$ has degree at most $n$ and has $n + 1$ distinct roots, where $R(x) = 1$. Therefore, $Q - R$ is the zero polynomial, so $Q(x) = R(x) = 1$.
 \end{proof}
 
-This fact shows some interesting proprties of interpolation:
+This fact shows some interesting properties of interpolation:
 \begin{enumerate}
-        \item Constants stay constant: if $y_0 = y_1 = \dots = C$ then $P(x) = \sum_i y_iL_i(x) = C \sum_iL_i(x) = C$
-        \item Translation invariance: if a constant $C$ is added to the function, for a new output point $z_i = y_i + C$, then the new polynomial $G(x)$ is defined as $G(x) = \sum_i y_iL_i(x) + C\sum_iL_i(x) = P(x) + C$
-        \item A collection of functions ${f_i(x)}$ that satisfies $\sum_i f_i(x) = 1$ is called a ``partition of unity''. It has multiple aplications in computer science, specially computer graphics for blending colors and geometry. So this idea is deeper than just this one method.
+        \item Constants stay constant: if $y_0 = y_1 = \dots = C$, then $P(x) = \sum_i y_iL_i(x) = C \sum_iL_i(x) = C$.
+        \item Translation invariance: if a constant $C$ is added to the function, then each new output point is $z_i = y_i + C$, and the new polynomial is $G(x) = \sum_i z_iL_i(x) = \sum_i y_iL_i(x) + C\sum_iL_i(x) = P(x) + C$.
+        \item A collection of functions $\{f_i(x)\}$ that satisfies $\sum_i f_i(x) = 1$ is called a ``partition of unity''. It has multiple applications in computer science, especially computer graphics, for blending colors and geometry. Thus, this idea extends beyond this method.
 \end{enumerate}
 
 \subsection{Error Analysis}\label{sec:error}
 
-Unlike root-finding algorithms, the interpolation ones do not take an $\epsilon$ as input, hence we need to calculate an error by hand.
+Unlike root-finding algorithms, interpolation algorithms do not take an $\epsilon$ as input; therefore, we need to calculate an error by hand.
 
 The error term for the approximation $P(x)$ of $f$ (assuming $f \in C^{n + 1}[a, b]$) using $n + 1$ data points is defined as:
 
@@ -137,32 +137,32 @@ The error term for the approximation $P(x)$ of $f$ (assuming $f \in C^{n + 1}[a,
   E_l(x) = \frac{f^{(n + 1)}(\xi(x))}{(n + 1)!}(x - x_0)(x - x_1)\dots(x - x_n)
 \]
 
-Notice that it is almost the same as the error term for Taylor's expasion:
+Notice that it is almost the same as the error term for Taylor's expansion:
 
 \[
   E_t(x) = \frac{f^{(n + 1)}(\xi(x))}{(n + 1)!}(x - x_0)^{n + 1}
 \]
 
-The proof for this relies on the Generalized Rolle's Theorem and the discussion about the amount of roots.
+The proof relies on the Generalized Rolle's Theorem and a root-counting argument.
 
 \begin{proof}
-  If $x$ is any of the given $x_i$ points then the error will be zero as expected. Consider now that $x \ne x_i$, we define
+  If $x$ is any of the given $x_i$ points, then the error is zero, as expected. Now consider $x \ne x_i$ for all $i$, and define
   \[
     E(x) = f(x) - P_n(x)
   \]
-  It's trivial to see that $E(x)$ has $n + 1$ roots (there are $n + 1$ given data points), so we can define one of the roots of the error as
+  The error $E$ has $n + 1$ roots at the given data points. Define the nodal polynomial
   \[
     w(t) = \prod_{i = 0}^n (t - x_i)
   \]
-  From where we can define a function $g(t)$ with this term
+  We can then define a function $g(t)$ using this polynomial:
   \[
     g(t) = f(t) - P_n(t) - Cw(t)
   \]
-  If we choose a $C$ such that $g(t) = 0$, so $C = \frac{E(t)}{w(t)}$, moreover, we have $g(x_i) = 0$ and $w(x_i) = 0$, so $g$ has $n + 2$ roots:
+  Choose $C = \frac{E(x)}{w(x)}$, so that $g(x) = 0$. Moreover, $g(x_i) = 0$ for every $i$, so $g$ has $n + 2$ roots:
   \[
-    x_0, x_1, \dots, x_n, t
+    x_0, x_1, \dots, x_n, x
   \]
-  Now assuming that $f \in C^{n + 1}$, Rolle's theorem ensures that $g'$ has at least $n + 1$ roots, and $g''$ has $n$ roots, and so on. Hence there exists one $\xi$ such that
+  Assuming that $f \in C^{n + 1}$, Rolle's theorem ensures that $g'$ has at least $n + 1$ roots and $g''$ has at least $n$ roots, and so on. Hence, there exists $\xi$ such that
   \[
     g^{(n + 1)}(\xi) = 0
   \]
@@ -170,12 +170,12 @@ The proof for this relies on the Generalized Rolle's Theorem and the discussion 
   \[
     g^{(n + 1)}(\xi) = f^{(n + 1)}(\xi) - P_n^{(n + 1)}(\xi) - Cw^{(n + 1)}(\xi)
   \]
-  But $P_n$ has at most degree $n$ to $P_n^{(n + 1)}(\xi) = 0$, and $w$ is a monic polynomial (that is, the coeficient of the highest nonzero term is 1), so it's $n + 1$ derivative is $(n + 1)!$. Lastly, we know $g^{(n + 1)}(\xi) = 0$, therefore the equation becomes
+  Since $P_n$ has degree at most $n$, $P_n^{(n + 1)}(\xi) = 0$. Moreover, $w$ is a monic polynomial of degree $n + 1$, so its $(n + 1)$st derivative is $(n + 1)!$. Since $g^{(n + 1)}(\xi) = 0$, the equation becomes
   \begin{gather*}
     f^{(n + 1)}(\xi) - C(n + 1)! = 0 \\
     C = \frac{f^{(n + 1)}(\xi)}{(n + 1)!}
   \end{gather*}
-  Now recalling our definition of $C$ as $\frac{E(t)}{w(t)}$, we can now use $t = x$ and expand $w$ to get the formula
+  Recalling the definition of $C$ as $\frac{E(x)}{w(x)}$ and expanding $w$ gives
   \begin{gather*}
     \frac{E(x)}{w(x)} = \frac{f^{(n + 1)}(\xi)}{(n + 1)!} \\
     E(x) = \frac{f^{(n + 1)}(\xi)}{(n + 1)!} \prod_{i = 0}^n (x - x_i)
@@ -184,25 +184,25 @@ The proof for this relies on the Generalized Rolle's Theorem and the discussion 
 
 \subsection{Convergence Rate}\label{sec:convergence_rate}
 
-The convergence rate of polynomial interpolation depends on both the smoothness of the interpolated function and the choice of interpolation points, so it's not trivial to define a rate of convergence for this method. Specifically, there is a phenomenon in Numerical Analysis called Runge's phenomenon, which states that polynimal interpolation on equidistant points causes ocilations at the edges of the interval. Runge's phenomenon is not guaranteed to happen, but it's frequent enough to call it one of the problems in polynomial interpolation. Furthermore, higher degree interpolations are not certain to increase accuracy (this will latter lead us to Neville's method).
+The convergence rate of polynomial interpolation depends on both the smoothness of the interpolated function and the choice of interpolation points, so it is not trivial to define a rate of convergence for this method. Specifically, Runge's phenomenon states that polynomial interpolation at equidistant points can cause oscillations at the edges of the interval. Runge's phenomenon is not guaranteed to occur, but it is frequent enough to be considered a problem in polynomial interpolation. Furthermore, higher-degree interpolations are not certain to increase accuracy; this will later lead us to Neville's method.
 
 There are strategies to mitigate this issue such as using Chebyshev nodes, but that's beyond the scope of this analysis.
 
 \subsection{Neville's Method}
 
-One of the problems with Lagrange interpolation is that it is dificult to apply the error term we calculated, since the function itself is tipically unknown. So it's tipically required to compute multiple arangements of data points $P_{i, j, k \dots}$ (Polynomial $P$ constructed using $x_i, x_j, \dots$) to know which one provides the best approximation. However, doing so with repeated Lagrange polynomials in different arrangements is a lot of work: there's no way to ``recycle'' the previous result to calculate the next with our current formula. But we're dealing with polynomials, it is likely that there is a connection between terms, say, $P_{i, j, k}$ and $P_{i, j, k, l}$.
+One problem with Lagrange interpolation is that it is difficult to apply the error term we calculated, since the function itself is typically unknown. It is typically necessary to compute interpolants for multiple arrangements of data points, such as $P_{i, j, k, \dots}$ (the polynomial $P$ constructed using $x_i, x_j, \dots$), to identify the best approximation. However, calculating repeated Lagrange polynomials for different arrangements is laborious: our current formula cannot reuse a previous result to calculate the next one. Since we are dealing with polynomials, there may be a connection between terms such as $P_{i, j, k}$ and $P_{i, j, k, l}$.
 
 This is where Neville's Method comes in: it establishes a relation between the polynomials, allowing for iterative calculations. Here's the relation:
 
 \[
-  P(x) = \frac{(x - x_j)P_{0, 1, \dots, j - i, j + 1, \dots k}(x) - (x - x_i)P_{0, 1, \dots, i - 1, i + 1, \dots k}(x)}{x_i - x_j}
+  P_{i,j}(x) = \frac{(x - x_i)P_{i+1,j}(x) - (x - x_j)P_{i,j-1}(x)}{x_j - x_i}
 \]
 
-Where $P$ is the k-th Lagrange polynomial that interpolates $f$ at $k + 1$ points $x_0 \dots x_k$.
+Here, $P_{i,j}$ is the interpolating polynomial through the points $x_i, x_{i+1}, \dots, x_j$.
 
-The big indicie on $P$ indicates that we are excluding the j-th and i-th points from the interpolation. The proof for this formula is just algebraic manipulations so we'll skip it.
+The indices on $P$ indicate the first and last points included in the interpolation. The proof of this formula consists only of algebraic manipulations, so we will skip it.
 
-An interesting proprety of this representation of $P$ is that it allows one to express a term with one more data point in terms of the one with less as follows:
+An interesting property of this representation of $P$ is that it allows one to express a term with one more data point in terms of a lower-degree term, as follows:
 
 \begin{gather*}
   P_{0, 1} = \frac{(x - x_0)P_{1}(x) - (x - x_1)P_{0}(x)}{x_1 - x_0} \\
@@ -211,13 +211,13 @@ An interesting proprety of this representation of $P$ is that it allows one to e
   \vdots
 \end{gather*}
 
-Using this method to calculate Lagrange polynomials is called Neville's Method. We can simplify and generalize it using some notation:
+Using this method to calculate Lagrange polynomials is called Neville's method. We can simplify and generalize it using the notation
 
 \[
-  Q_{i, j} = P_{i - j, i - j + 1, \dots, i - 1, i}
+  Q_{i, j} = P_{i-j,i}
 \]
 
-And given $n$ data points we get all polynomials entries in a sparse matrix as
+Given $n$ data points, all polynomial entries form a lower-triangular matrix:
 
 \[
   \begin{bmatrix}
@@ -233,48 +233,48 @@ We'll build this matrix in the next session.
 
 \section{The Algorithms}\label{sec:algorithm}
 
-We'll have two algorithms in this section. The straight forward Lagrange Interpolating Polynomial of the highest degree, implemented as ``lagrange.m'' in the repository (see Section~\ref{sec:implementation} for further details), and Neiville's Method.
+This section presents two algorithms: the straightforward highest-degree Lagrange interpolating polynomial, implemented as ``lagrange.m'' in the repository (see Section~\ref{sec:implementation} for further details), and Neville's method.
 
 \subsection{Lagrange Interpolating Polynomial}
 
 \begin{enumerate}\label{alg:lagrange_alg}
-        \item Calculate $P(x)$ at the interest point $x_p$.
+        \item Calculate $P(x)$ at the point of interest $x_p$.
 \end{enumerate}
 
-Yes, the algorim is just a straight forward calculation. Not very interesting compared to the amount of theory that lead to it.
+The algorithm is a straightforward calculation, despite the amount of theory that led to it.
 
 \subsection{Neville's Method}
 
 \begin{enumerate}\label{alg:neville_alg}
-        \item Initialize a table $Qs$ with dimensions $n$ by $n$ and the first collumn as the $y$ values of the data points
-        \item For each $i$ from $1$ to $n$, assign $Qs_{i, j}$ to $Q_{i, j}$ for each $j$ from $1$ to $i$
+        \item Initialize an $n$ by $n$ table $Qs$ with its first column set to the $y$ values of the data points.
+        \item For each $i$ from $2$ to $n$ and each $j$ from $2$ to $i$, set $Qs_{i,j}$ equal to $Q_{i,j}$.
 \end{enumerate}
 
-Note that Neville's algorithms is a textbook example of an iterative method, computing the next term based on the previous ones.
+Note that Neville's algorithm is a textbook example of an iterative method, computing each term from previous ones.
 
 \section{Analysis of the Algorithms}\label{sec:analysis}
 
 \subsection{Lagrange Interpolating Polynomial}
 
-The good thing about an algorithm so simple is that the analysis is trivial. There are two nested loops in the execution that scale proportionally to $n$ (one to generate the $L_i$ terms and other to generate the polynomials inside each $L_i$). So the algorithm's runtime is dominated by $n^2$, hence $\text{Lagrange} \in O(n^2)$.
+The good thing about such a simple algorithm is that its analysis is trivial. There are two nested loops that scale proportionally to $n$: one generates the $L_i$ terms and the other generates the factors inside each $L_i$. Thus, the algorithm's runtime is dominated by $n^2$, so $\text{Lagrange} \in O(n^2)$.
 
 \subsection{Neville's Method}
 
-Neville's is harder to calculate the exact number of mathematical operations, but we can see it's order of complexity is bounded above by $n^2$ calculations of $Q$, which is constant time (because we are using already computated table entries), so $\text{Neville} \in O(n^2)$. So the asymtotic complexity of these algorithms is the same, with Neville's providing more information about the approximations, even if overall it does more calculations.
+For Neville's method, its order of complexity is bounded above by $n^2$ calculations of $Q$, each of which takes constant time because it uses previously computed table entries. Thus, $\text{Neville} \in O(n^2)$. The asymptotic complexity of these algorithms is the same, with Neville's method providing more information about the approximations, even though it performs more calculations overall.
 
 \section{Implementations}\label{sec:implementation}
 
-For the language of choice implementing numerical methods we will use GNU Octave~\cite{octave}. The source code can be found in the GitHub repository ``numerical\_methods''~\cite{repo}, along with the sources of the analysis papers and other methods.
+As the language of choice for implementing numerical methods, we use GNU Octave~\cite{octave}. The source code can be found in the GitHub repository ``numerical\_methods''~\cite{repo}, along with the sources of the analysis papers and other methods.
 
 The implementations follow the algorithms described in Section~\ref{sec:algorithm}. The algorithm for Lagrange is so simple that one could actually write the entire code in one line, but that would obviously obfuscate the code for no reason. So the code is split into ``lagrange'' and ``L'' for clarity.
 
-One detail is that our formulas are ``0-indexed'' but GNU Octave is ``1-indexed'', so our ranges are $[1, \rho(xs)]$ instead of the tipical (used in most laguages) $[0, \rho(xs))$. Specifically, in Neville's method we have to take $j = 1$ as a special case to avoid indexing invaid entries in the table. Moreover, empty entries are treated as zero instead of just being left empty.
+One detail is that our formulas are ``0-indexed'', but GNU Octave is ``1-indexed'', so our ranges are $[1, \rho(xs)]$ instead of the typical $[0, \rho(xs))$ used in most languages. Specifically, in Neville's method, we treat $j = 1$ as a special case to avoid indexing invalid entries in the table. Moreover, empty entries are treated as zero instead of being left empty.
 
 \section{Results}\label{sec:results}
 
 \subsection{Lagrange's}
 
-The final executable for Lagrange recieves $xs$ and $ys$, the data points and $x$, the point to calculate $P$ at.
+The final executable for Lagrange receives $xs$ and $ys$, the data points, and $x$, the point at which to calculate $P$.
 
 \begin{lstlisting}[caption={First execution of Lagrange's}]
 > Enter the x values [x0, x1, ... xn]: [0, 2, 5, 9]
@@ -290,11 +290,11 @@ f(3.300000) is approximatly 11.19759776190476
 f(3.300000) is approximatly 11.83040000000000
 \end{lstlisting}
 
-The actual value for $f(x) = x^2 - cos(x)$ at $3.3$ is $11.877479769908863$. Notice that even tho we used the same amount of points, having them in different places yeilds different results. Empirically proving the point made under subsection~\ref{sec:convergence_rate}.
+The actual value for $f(x) = x^2 - \cos(x)$ at $3.3$ is $11.877479769908863$. Notice that, although we used the same number of points, placing them differently yields different results. This empirically supports the point made in Section~\ref{sec:convergence_rate}.
 
 \subsection{Neville's}
 
-\begin{lstlisting}[caption={First execution of Nevilles's}]
+\begin{lstlisting}[caption={First execution of Neville's}]
 > Enter the x values [x0; x1; ... xn]: [0; 1; 2; 3; 4]
 > Enter the y values [y0; y1; ... yn]: [-1.0000; 0.4596; 4.4161; 9.9899; 16.6536]
 > Enter the point where you want f(x) to be estimated: 1.64
@@ -307,11 +307,11 @@ Final table:
 Interpolated value (max degree) at x = 1.64: 2.767052
 \end{lstlisting}
 
-The actual value for $f(x) = x^2 - cos(x)$ at $1.64$ is $2.7587484486540617$, the best approximation is $2.7595$, with error $(7.5155)10^{-4}$, versus the highest polynomial's $(8.3515)10^{-3}$. Empirically proving the point made under the subsection~\ref{sec:convergence_rate}.
+The actual value for $f(x) = x^2 - \cos(x)$ at $1.64$ is $2.7587484486540617$. The best approximation is $2.7595$, with an error of $7.5155 \times 10^{-4}$, compared with the highest-degree polynomial's error of $8.3036 \times 10^{-3}$. This empirically supports the point made in Section~\ref{sec:convergence_rate}.
 
-\section{Conclusion and Discussion}\label{sec:conlusion}
+\section{Conclusion and Discussion}\label{sec:conclusion}
 
-Lagrange's interpolation is a tool used for finding polynomial approximations to unknown functions given a set of known data points. It's a real-world tool for multiple areas (such as Cryptography and Digital Signal Processing) and has an interesting methematical derivation and consequences.
+Lagrange interpolation is a tool for finding polynomial approximations to unknown functions from a set of known data points. It is used in multiple areas, such as cryptography and digital signal processing, and has an interesting mathematical derivation and consequences.
 
 \bibliographystyle{ieeetr}
 \bibliography{bibliography}
